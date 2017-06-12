@@ -612,6 +612,17 @@ func (s *Stmt) SQL() string {
 	return s.sql
 }
 
+// ExpandedSQL returns the SQL associated with a prepared statement, with bound parameters included.
+// (See https://sqlite.org/c3ref/expanded_sql.html)
+func (s *Stmt) ExpandedSQL() (string, error) {
+	if C.SQLITE_VERSION_NUMBER <= 3014000 {
+		return "", errors.New("Your SQLite is too old.  Needs to be 3.14.0 or above.")
+	}
+	eSQL := C.sqlite3_expanded_sql(s.stmt)
+	defer C.sqlite3_free(unsafe.Pointer(eSQL))
+	return C.GoString(eSQL), nil
+}
+
 // Empty returns true when then input text contains no SQL (if the input is an empty string or a comment)
 func (s *Stmt) Empty() bool {
 	return s.stmt == nil
