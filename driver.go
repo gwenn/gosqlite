@@ -266,7 +266,7 @@ func (c *conn) Rollback() error {
 // https://golang.org/pkg/database/sql/driver/#SessionResetter
 func (c *conn) ResetSession(ctx context.Context) error {
 	// closed or pending transaction or at least one statement busy
-	if c.c.IsClosed() || !c.c.GetAutocommit() || c.c.IsBusy() {
+	if c.c.IsClosed() || !c.c.GetAutocommit() /*|| c.c.IsBusy()*/ {
 		return driver.ErrBadConn
 	}
 	return nil
