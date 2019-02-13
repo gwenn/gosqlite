@@ -637,7 +637,7 @@ func (c *Conn) Close() error {
 			if C.sqlite3_stmt_busy(stmt) != 0 {
 				Log(C.SQLITE_MISUSE, "Dangling statement (not reset): \""+C.GoString(C.sqlite3_sql(stmt))+"\"")
 			} else {
-				Log(C.SQLITE_MISUSE, "Dangling statement (not finalize): \""+C.GoString(C.sqlite3_sql(stmt))+"\"")
+				Log(C.SQLITE_MISUSE, "Dangling statement (not finalized): \""+C.GoString(C.sqlite3_sql(stmt))+"\"")
 			}
 			C.sqlite3_finalize(stmt)
 			stmt = C.sqlite3_next_stmt(c.db, nil)
@@ -651,6 +651,18 @@ func (c *Conn) Close() error {
 	}
 	c.db = nil
 	return nil
+}
+
+// IsBusy tells if at least one statement has not been reset/finalized.
+func (c *Conn) IsBusy() bool {
+	stmt := C.sqlite3_next_stmt(c.db, nil)
+	for stmt != nil {
+		if C.sqlite3_stmt_busy(stmt) != 0 {
+			return true
+		}
+		stmt = C.sqlite3_next_stmt(c.db, nil)
+	}
+	return false
 }
 
 // IsClosed tells if the database connection has been closed.

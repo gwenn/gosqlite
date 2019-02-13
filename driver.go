@@ -263,6 +263,15 @@ func (c *conn) Rollback() error {
 	return c.c.Rollback()
 }
 
+// https://golang.org/pkg/database/sql/driver/#SessionResetter
+func (c *conn) ResetSession(ctx context.Context) error {
+	// closed or pending transaction or at least one statement busy
+	if c.c.IsClosed() || !c.c.GetAutocommit() || c.c.IsBusy() {
+		return driver.ErrBadConn
+	}
+	return nil
+}
+
 // https://golang.org/pkg/database/sql/driver/#Stmt
 func (s *stmt) Close() error {
 	if s.rowsRef { // Currently, it never happens because the sql.Stmt doesn't call driver.Stmt in this case
