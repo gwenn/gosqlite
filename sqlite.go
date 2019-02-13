@@ -660,7 +660,7 @@ func (c *Conn) IsBusy() bool {
 		if C.sqlite3_stmt_busy(stmt) != 0 {
 			return true
 		}
-		stmt = C.sqlite3_next_stmt(c.db, nil)
+		stmt = C.sqlite3_next_stmt(c.db, stmt)
 	}
 	return false
 }
