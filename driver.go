@@ -129,10 +129,6 @@ func (c *conn) Ping(ctx context.Context) error {
 
 // PRAGMA schema_version may be used to detect when the database schema is altered
 
-func (c *conn) Exec(query string, args []driver.Value) (driver.Result, error) {
-	panic("ExecContext was not called.")
-}
-
 // https://golang.org/pkg/database/sql/driver/#Conn
 func (c *conn) Prepare(query string) (driver.Stmt, error) {
 	panic("use PrepareContext")
