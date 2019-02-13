@@ -527,9 +527,9 @@ func TestBindEmptyZero(t *testing.T) {
 	err = s.Scan(&ps, &zt)
 	checkNoError(t, err, "scan error: %s")
 	assert.T(t, ps == nil && zt.IsZero(), "null pointers expected")
-	_, null := s.ScanValue(0, false)
+	_, null := s.ScanValue(0)
 	assert.T(t, null, "null string expected")
-	_, null = s.ScanValue(1, false)
+	_, null = s.ScanValue(1)
 	assert.T(t, null, "null time expected")
 }
 
@@ -555,9 +555,9 @@ func TestBindEmptyZeroNotTransformedToNull(t *testing.T) {
 	err = s.Scan(&st, &zt)
 	checkNoError(t, err, "scan error: %s")
 	assert.T(t, len(st) == 0 && zt.IsZero(), "null pointers expected")
-	_, null := s.ScanValue(0, false)
+	_, null := s.ScanValue(0)
 	assert.T(t, !null, "empty string expected")
-	_, null = s.ScanValue(1, false)
+	_, null = s.ScanValue(1)
 	assert.T(t, !null, "zero time expected")
 }
 

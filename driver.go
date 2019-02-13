@@ -346,7 +346,7 @@ func (r *rowsImpl) Next(dest []driver.Value) error {
 		return io.EOF
 	}
 	for i := range dest {
-		dest[i], _ = r.s.s.ScanValue(i, true)
+		dest[i], _ = r.s.s.ScanValue(i)
 		/*if !driver.IsScanValue(dest[i]) {
 			panic("Invalid type returned by ScanValue")
 		}*/
