@@ -425,6 +425,8 @@ func _TestPreparedStmt(t *testing.T) {
 }
 
 func TestCancel(t *testing.T) {
+	skipIfCgoCheckActive(t)
+
 	db := sqlCreate(ddl, t)
 	defer checkSqlDbClose(db, t)
 
