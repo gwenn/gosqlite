@@ -53,11 +53,11 @@ func (c *cache) release(s *Stmt) error {
 		return s.finalize()
 	}
 	if err := s.Reset(); err != nil {
-		s.finalize()
+		_ = s.finalize()
 		return err
 	}
 	if err := s.ClearBindings(); err != nil {
-		s.finalize()
+		_ = s.finalize()
 		return nil
 	}
 	c.m.Lock()

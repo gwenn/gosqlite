@@ -109,7 +109,7 @@ func (c *Conn) queryOrSetEnableDbConfig(key, i C.int) (bool, error) {
 	var ok C.int
 	rv := C.my_db_config(c.db, key, i, &ok)
 	if rv == C.SQLITE_OK {
-		return (ok == 1), nil
+		return ok == 1, nil
 	}
 	return false, c.error(rv)
 }

@@ -440,7 +440,7 @@ func (s *Stmt) ExplainQueryPlan(w io.Writer) error {
 		if err := s.Scan(&selectid, &order, &from, &detail); err != nil {
 			return err
 		}
-		fmt.Fprintf(w, "%d\t%d\t%d\t%s\n", selectid, order, from, detail)
+		_, _ = fmt.Fprintf(w, "%d\t%d\t%d\t%s\n", selectid, order, from, detail)
 		return nil
 	})
 	return err

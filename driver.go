@@ -186,7 +186,7 @@ func (c *conn) ExecContext(ctx context.Context, query string, args []driver.Name
 		}
 		err = s.exec()
 		if err != nil {
-			s.finalize()
+			_ = s.finalize()
 			return nil, ctxError(ctx, err)
 		}
 		if err = s.finalize(); err != nil {
@@ -233,7 +233,7 @@ func (c *conn) BeginTx(ctx context.Context, opts driver.TxOptions) (driver.Tx, e
 		return nil, driver.ErrBadConn
 	}
 	if !c.c.GetAutocommit() {
-		return nil, errors.New("Nested transactions are not supported")
+		return nil, errors.New("nested transactions are not supported")
 	}
 	if err := c.c.SetQueryOnly("", opts.ReadOnly); err != nil {
 		return nil, err

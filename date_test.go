@@ -100,7 +100,7 @@ func TestBindTimeAsString(t *testing.T) {
 	now := time.Now()
 	//id1, err := is.Insert(YearMonthDay(now))
 	//checkNoError(t, err, "error inserting YearMonthDay: %s")
-	id2, err := is.Insert(TimeStamp{now})
+	id2, err := is.Insert(TimeStamp{Time: now})
 	checkNoError(t, err, "error inserting TimeStamp: %s")
 
 	// The format used to persist has a max precision of 1ms.
@@ -129,9 +129,9 @@ func TestBindTimeAsNumeric(t *testing.T) {
 	checkNoError(t, err, "prepare error: %s")
 
 	now := time.Now()
-	id1, err := is.Insert(UnixTime{now})
+	id1, err := is.Insert(UnixTime{Time: now})
 	checkNoError(t, err, "error inserting UnixTime: %s")
-	id2, err := is.Insert(JulianTime{now})
+	id2, err := is.Insert(JulianTime{Time: now})
 	checkNoError(t, err, "error inserting JulianTime: %s")
 	checkFinalize(is, t)
 
@@ -158,7 +158,7 @@ func TestJulianTime(t *testing.T) {
 	checkNoError(t, err, "prepare error: %s")
 
 	now := time.Now()
-	id, err := is.Insert(JulianTime{now})
+	id, err := is.Insert(JulianTime{Time: now})
 	checkNoError(t, err, "error inserting JulianTime: %s")
 	_, err = is.Insert(JulianTime{})
 	checkNoError(t, err, "error inserting JulianTime: %s")
@@ -194,7 +194,7 @@ func TestTimeStamp(t *testing.T) {
 	checkNoError(t, err, "prepare error: %s")
 
 	now := time.Now()
-	id, err := is.Insert(TimeStamp{now})
+	id, err := is.Insert(TimeStamp{Time: now})
 	checkNoError(t, err, "error inserting TimeStamp: %s")
 	_, err = is.Insert(TimeStamp{})
 	checkNoError(t, err, "error inserting TimeStamp: %s")
@@ -233,7 +233,7 @@ func TestUnixTime(t *testing.T) {
 	checkNoError(t, err, "prepare error: %s")
 
 	now := time.Now()
-	id, err := is.Insert(UnixTime{now})
+	id, err := is.Insert(UnixTime{Time: now})
 	checkNoError(t, err, "error inserting UnixTime: %s")
 	_, err = is.Insert(UnixTime{})
 	checkNoError(t, err, "error inserting UnixTime: %s")

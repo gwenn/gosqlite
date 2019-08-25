@@ -26,9 +26,9 @@ const (
 		"INSERT INTO test (name) VALUES ('Lisa');" +
 		"UPDATE test SET name = 'El Barto' WHERE name = 'Bart';" +
 		"DELETE FROM test WHERE name = 'Bart';"
-	insert       = "INSERT INTO test (name) VALUES (?)"
-	insert_named = "INSERT INTO test (name) VALUES (:name)"
-	query        = "SELECT * FROM test WHERE name LIKE ?"
+	insert      = "INSERT INTO test (name) VALUES (?)"
+	insertNamed = "INSERT INTO test (name) VALUES (:name)"
+	query       = "SELECT * FROM test WHERE name LIKE ?"
 )
 
 func sqlOpen(t *testing.T) *sql.DB {
@@ -112,7 +112,7 @@ func TestSqlInsert(t *testing.T) {
 func TestSqlInsertNamed(t *testing.T) {
 	db := sqlCreate(ddl, t)
 	defer checkSqlDbClose(db, t)
-	result, err := db.Exec(insert_named, sql.Named("name", "Bart"))
+	result, err := db.Exec(insertNamed, sql.Named("name", "Bart"))
 	checkNoError(t, err, "Error updating data: %s")
 	id, err := result.LastInsertId()
 	checkNoError(t, err, "Error while calling LastInsertId: %s")
@@ -182,7 +182,7 @@ func TestSqlPrepareNamed(t *testing.T) {
 	db := sqlCreate(ddl+dml, t)
 	defer checkSqlDbClose(db, t)
 
-	stmt, err := db.Prepare(insert_named)
+	stmt, err := db.Prepare(insertNamed)
 	checkNoError(t, err, "Error while preparing stmt: %s")
 	defer checkSqlStmtClose(stmt, t)
 	result, err := stmt.Exec(sql.Named("name", "Bart"))

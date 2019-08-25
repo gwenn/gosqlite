@@ -6,7 +6,6 @@ package sqlite_test
 
 import (
 	"io"
-	"os"
 	"testing"
 
 	"github.com/bmizerany/assert"
@@ -66,7 +65,7 @@ func TestBlob(t *testing.T) {
 
 	err = br.Reopen(rowid)
 	checkNoError(t, err, "blob reopen error: %s")
-	_, err = br.Seek(0, os.SEEK_SET)
+	_, err = br.Seek(0, io.SeekStart)
 	checkNoError(t, err, "blob seek error: %s")
 
 	err = br.Reopen(-1)
