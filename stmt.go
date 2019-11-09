@@ -391,7 +391,7 @@ func (s *Stmt) BindByIndex(index int, value interface{}) error {
 			rv = C.sqlite3_bind_int64(s.stmt, i, C.sqlite3_int64(value.Unix()))
 		} else {
 			v := value.Format(s.c.DefaultTimeLayout)
-			rv = C.my_bind_text(s.stmt, i, C.CString(v), C.int(len(v)))
+			rv = C.sqlite3_bind_text(s.stmt, i, C.CString(v), C.int(len(v)), (*[0]byte)(C.free))
 		}
 	case ZeroBlobLength:
 		rv = C.sqlite3_bind_zeroblob(s.stmt, i, C.int(value))
@@ -417,7 +417,7 @@ func (s *Stmt) BindReflect(index int, value interface{}) error {
 	switch v.Kind() {
 	case reflect.String:
 		vs := v.String() // TODO NullIfEmptyString
-		rv = C.my_bind_text(s.stmt, i, C.CString(vs), C.int(len(vs)))
+		rv = C.sqlite3_bind_text(s.stmt, i, C.CString(vs), C.int(len(vs)), (*[0]byte)(C.free))
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		rv = C.sqlite3_bind_int64(s.stmt, i, C.sqlite3_int64(v.Int()))
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
