@@ -4,7 +4,6 @@
 
 #include <sqlite3.h>
 #include <stdlib.h>
-//#include "_cgo_export.h"
 
 extern void goXTrace(void *udp, const char *sql);
 

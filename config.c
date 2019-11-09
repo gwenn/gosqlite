@@ -3,7 +3,6 @@
 // license that can be found in the LICENSE file.
 
 #include <sqlite3.h>
-//#include "_cgo_export.h"
 
 int goSqlite3ConfigThreadMode(int mode) {
 	return sqlite3_config(mode);

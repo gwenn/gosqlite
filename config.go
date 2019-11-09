@@ -13,8 +13,8 @@ static inline int my_db_config(sqlite3 *db, int op, int v, int *ok) {
 	return sqlite3_db_config(db, op, v, ok);
 }
 
-int goSqlite3ConfigThreadMode(int mode);
-int goSqlite3Config(int op, int mode);
+extern int goSqlite3ConfigThreadMode(int mode);
+extern int goSqlite3Config(int op, int mode);
 */
 import "C"
 

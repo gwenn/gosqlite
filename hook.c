@@ -3,8 +3,6 @@
 // license that can be found in the LICENSE file.
 
 #include <sqlite3.h>
-// warning: incompatible pointer types passing
-//#include "_cgo_export.h"
 
 extern int goXCommitHook(void *udp);
 

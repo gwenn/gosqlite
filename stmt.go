@@ -17,9 +17,6 @@ package sqlite
 // #define SQLITE_STATIC      ((sqlite3_destructor_type)0)
 // #define SQLITE_TRANSIENT   ((sqlite3_destructor_type)-1)
 
-static inline int my_bind_text(sqlite3_stmt *stmt, int pidx, const char *data, int data_len) {
-	return sqlite3_bind_text(stmt, pidx, data, data_len, free);
-}
 static inline int my_bind_empty_text(sqlite3_stmt *stmt, int pidx) {
 	return sqlite3_bind_text(stmt, pidx, "", 0, SQLITE_STATIC);
 }
@@ -358,7 +355,7 @@ func (s *Stmt) BindByIndex(index int, value interface{}) error {
 			if i64 && len(value) > math.MaxInt32 {
 				return s.specificError("string too big: %d at index %d", len(value), index)
 			}
-			rv = C.my_bind_text(s.stmt, i, C.CString(value), C.int(len(value)))
+			rv = C.sqlite3_bind_text(s.stmt, i, C.CString(value), C.int(len(value)), (*[0]byte)(C.free))
 		}
 	case int:
 		if i64 {

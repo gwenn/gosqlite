@@ -46,9 +46,11 @@ static inline int my_value_numeric_type(sqlite3_value **argv, int i) {
 	return sqlite3_value_numeric_type(argv[i]);
 }
 
-extern void goSqlite3SetAuxdata(sqlite3_context *ctx, int N, void *ad);
-extern int goSqlite3CreateScalarFunction(sqlite3 *db, const char *zFunctionName, int nArg, int eTextRep, void *pApp);
-extern int goSqlite3CreateAggregateFunction(sqlite3 *db, const char *zFunctionName, int nArg, int eTextRep, void *pApp);
+extern void goXAuxDataDestroy(void*);
+extern void goXDestroy(void*);
+extern void goXFunc(sqlite3_context *ctx, int argc, sqlite3_value **argv);
+extern void goXStep(sqlite3_context *ctx, int argc, sqlite3_value **argv);
+extern void goXFinal(sqlite3_context *ctx);
 */
 import "C"
 
@@ -402,34 +404,34 @@ func goXAuxDataDestroy(ad unsafe.Pointer) {
 }
 
 //export goXFunc
-func goXFunc(scp, udfp, ctxp unsafe.Pointer, argc int, argv unsafe.Pointer) {
-	udf := (*sqliteFunction)(udfp)
+func goXFunc(ctx *C.sqlite3_context, argc C.int, argv **C.sqlite3_value) {
+	udf := (*sqliteFunction)(C.sqlite3_user_data(ctx))
 	// To avoid the creation of a Context at each call, just put it in auxdata
-	c := (*ScalarContext)(ctxp)
+	c := (*ScalarContext)(C.sqlite3_get_auxdata(ctx, 0))
 	if c == nil {
 		c = new(ScalarContext)
-		c.sc = (*Context)(scp)
+		c.sc = (*Context)(ctx)
 		c.udf = udf
-		C.goSqlite3SetAuxdata((*C.sqlite3_context)(c.sc), 0, unsafe.Pointer(c))
+		C.sqlite3_set_auxdata(ctx, 0, unsafe.Pointer(c), (*[0]byte)(C.goXAuxDataDestroy))
 		// To make sure it is not cged
 		udf.scalarCtxs[c] = struct{}{}
 	}
-	c.argv = (**C.sqlite3_value)(argv)
-	udf.scalar(c, argc)
+	c.argv = argv
+	udf.scalar(c, int(argc))
 	c.argv = nil
 }
 
 //export goXStep
-func goXStep(scp, udfp unsafe.Pointer, argc int, argv unsafe.Pointer) {
-	udf := (*sqliteFunction)(udfp)
+func goXStep(ctx *C.sqlite3_context, argc C.int, argv **C.sqlite3_value) {
+	udf := (*sqliteFunction)(C.sqlite3_user_data(ctx))
 	var cp unsafe.Pointer
-	cp = C.sqlite3_aggregate_context((*C.sqlite3_context)(scp), C.int(unsafe.Sizeof(cp)))
+	cp = C.sqlite3_aggregate_context(ctx, C.int(unsafe.Sizeof(cp)))
 	if cp != nil {
 		var c *AggregateContext
 		p := *(*unsafe.Pointer)(cp)
 		if p == nil {
 			c = new(AggregateContext)
-			c.sc = (*Context)(scp)
+			c.sc = (*Context)(ctx)
 			*(*unsafe.Pointer)(cp) = unsafe.Pointer(c)
 			// To make sure it is not cged
 			udf.aggrCtxs[c] = struct{}{}
@@ -438,21 +440,21 @@ func goXStep(scp, udfp unsafe.Pointer, argc int, argv unsafe.Pointer) {
 		}
 
 		c.argv = (**C.sqlite3_value)(argv)
-		udf.step(c, argc)
+		udf.step(c, int(argc))
 		c.argv = nil
 	}
 }
 
 //export goXFinal
-func goXFinal(scp, udfp unsafe.Pointer) {
-	udf := (*sqliteFunction)(udfp)
-	cp := C.sqlite3_aggregate_context((*C.sqlite3_context)(scp), 0)
+func goXFinal(ctx *C.sqlite3_context) {
+	udf := (*sqliteFunction)(C.sqlite3_user_data(ctx))
+	cp := C.sqlite3_aggregate_context(ctx, 0)
 	if cp != nil {
 		p := *(*unsafe.Pointer)(cp)
 		if p != nil {
 			c := (*AggregateContext)(p)
 			delete(udf.aggrCtxs, c)
-			c.sc = (*Context)(scp)
+			c.sc = (*Context)(ctx)
 			udf.final(c)
 		}
 	}
@@ -494,7 +496,7 @@ func (c *Conn) CreateScalarFunction(functionName string, nArg int32, determinist
 		c.udfs = make(map[string]*sqliteFunction)
 	}
 	c.udfs[functionName] = udf // FIXME same function name with different args is not supported
-	return c.error(C.goSqlite3CreateScalarFunction(c.db, fname, C.int(nArg), eTextRep, unsafe.Pointer(udf)),
+	return c.error(C.sqlite3_create_function_v2(c.db, fname, C.int(nArg), eTextRep, unsafe.Pointer(udf), (*[0]byte)(C.goXFunc), nil, nil, (*[0]byte)(C.goXDestroy)),
 		fmt.Sprintf("Conn.CreateScalarFunction(%q)", functionName))
 }
 
@@ -519,6 +521,6 @@ func (c *Conn) CreateAggregateFunction(functionName string, nArg int32, pApp int
 		c.udfs = make(map[string]*sqliteFunction)
 	}
 	c.udfs[functionName] = udf // FIXME same function name with different args is not supported
-	return c.error(C.goSqlite3CreateAggregateFunction(c.db, fname, C.int(nArg), C.SQLITE_UTF8, unsafe.Pointer(udf)),
+	return c.error(C.sqlite3_create_function_v2(c.db, fname, C.int(nArg), C.SQLITE_UTF8, unsafe.Pointer(udf), nil, (*[0]byte)(C.goXStep), (*[0]byte)(C.goXFinal), (*[0]byte)(C.goXDestroy)),
 		fmt.Sprintf("Conn.CreateAggregateFunction(%q)", functionName))
 }
