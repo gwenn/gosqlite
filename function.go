@@ -46,9 +46,9 @@ static inline int my_value_numeric_type(sqlite3_value **argv, int i) {
 	return sqlite3_value_numeric_type(argv[i]);
 }
 
-void goSqlite3SetAuxdata(sqlite3_context *ctx, int N, void *ad);
-int goSqlite3CreateScalarFunction(sqlite3 *db, const char *zFunctionName, int nArg, int eTextRep, void *pApp);
-int goSqlite3CreateAggregateFunction(sqlite3 *db, const char *zFunctionName, int nArg, int eTextRep, void *pApp);
+extern void goSqlite3SetAuxdata(sqlite3_context *ctx, int N, void *ad);
+extern int goSqlite3CreateScalarFunction(sqlite3 *db, const char *zFunctionName, int nArg, int eTextRep, void *pApp);
+extern int goSqlite3CreateAggregateFunction(sqlite3 *db, const char *zFunctionName, int nArg, int eTextRep, void *pApp);
 */
 import "C"
 

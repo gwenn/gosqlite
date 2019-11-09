@@ -8,18 +8,18 @@ package sqlite
 #include <sqlite3.h>
 #include <stdlib.h>
 
-void goSqlite3Trace(sqlite3 *db, void *udp);
-void goSqlite3Profile(sqlite3 *db, void *udp);
-int goSqlite3SetAuthorizer(sqlite3 *db, void *udp);
-int goSqlite3BusyHandler(sqlite3 *db, void *udp);
-void goSqlite3ProgressHandler(sqlite3 *db, int numOps, void *udp);
+extern void goSqlite3Trace(sqlite3 *db, void *udp);
+extern void goSqlite3Profile(sqlite3 *db, void *udp);
+extern int goSqlite3SetAuthorizer(sqlite3 *db, void *udp);
+extern int goSqlite3BusyHandler(sqlite3 *db, void *udp);
+extern void goSqlite3ProgressHandler(sqlite3 *db, int numOps, void *udp);
 
 // cgo doesn't support varargs
 static inline void my_log(int iErrCode, char *msg) {
 	sqlite3_log(iErrCode, msg);
 }
 
-int goSqlite3ConfigLog(void *udp);
+extern int goSqlite3ConfigLog(void *udp);
 */
 import "C"
 

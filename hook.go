@@ -7,10 +7,10 @@ package sqlite
 /*
 #include <sqlite3.h>
 
-void* goSqlite3CommitHook(sqlite3 *db, void *udp);
-void* goSqlite3RollbackHook(sqlite3 *db, void *udp);
-void* goSqlite3UpdateHook(sqlite3 *db, void *udp);
-//void* goSqlite3WalHook(sqlite3 *db, void *udp);
+extern void* goSqlite3CommitHook(sqlite3 *db, void *udp);
+extern void* goSqlite3RollbackHook(sqlite3 *db, void *udp);
+extern void* goSqlite3UpdateHook(sqlite3 *db, void *udp);
+//extern void* goSqlite3WalHook(sqlite3 *db, void *udp);
 */
 import "C"
 
