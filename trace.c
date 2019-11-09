@@ -37,6 +37,11 @@ void goSqlite3ProgressHandler(sqlite3 *db, int numOps, void *udp) {
 
 extern void goXLog(void *udp, int err, const char *msg);
 
+// cgo doesn't support varargs
+void my_log(int iErrCode, char *msg) {
+	sqlite3_log(iErrCode, msg);
+}
+
 int goSqlite3ConfigLog(void *udp) {
 	if (udp) {
 		return sqlite3_config(SQLITE_CONFIG_LOG, goXLog, udp);

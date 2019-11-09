@@ -7,44 +7,11 @@ package sqlite
 /*
 #include <sqlite3.h>
 #include <stdlib.h>
+
 // These wrappers are necessary because SQLITE_TRANSIENT
 // is a pointer constant, and cgo doesn't translate them correctly.
-
-static inline void my_result_text(sqlite3_context *ctx, char *p, int np) {
-	sqlite3_result_text(ctx, p, np, SQLITE_TRANSIENT);
-}
-static inline void my_result_blob(sqlite3_context *ctx, void *p, int np) {
-	sqlite3_result_blob(ctx, p, np, SQLITE_TRANSIENT);
-}
-
-static inline void my_result_value(sqlite3_context *ctx, sqlite3_value **argv, int i) {
-	sqlite3_result_value(ctx, argv[i]);
-}
-
-static inline const void *my_value_blob(sqlite3_value **argv, int i) {
-	return sqlite3_value_blob(argv[i]);
-}
-static inline int my_value_bytes(sqlite3_value **argv, int i) {
-	return sqlite3_value_bytes(argv[i]);
-}
-static inline double my_value_double(sqlite3_value **argv, int i) {
-	return sqlite3_value_double(argv[i]);
-}
-static inline int my_value_int(sqlite3_value **argv, int i) {
-	return sqlite3_value_int(argv[i]);
-}
-static inline sqlite3_int64 my_value_int64(sqlite3_value **argv, int i) {
-	return sqlite3_value_int64(argv[i]);
-}
-static inline const unsigned char *my_value_text(sqlite3_value **argv, int i) {
-	return sqlite3_value_text(argv[i]);
-}
-static inline int my_value_type(sqlite3_value **argv, int i) {
-	return sqlite3_value_type(argv[i]);
-}
-static inline int my_value_numeric_type(sqlite3_value **argv, int i) {
-	return sqlite3_value_numeric_type(argv[i]);
-}
+extern void my_result_text(sqlite3_context *ctx, char *p, int np);
+extern void my_result_blob(sqlite3_context *ctx, void *p, int np);
 
 extern void goXAuxDataDestroy(void*);
 extern void goXDestroy(void*);
@@ -76,7 +43,7 @@ type Context C.sqlite3_context
 // (See http://sqlite.org/c3ref/context.html)
 type FunctionContext struct {
 	sc   *Context
-	argv **C.sqlite3_value
+	argv []*C.sqlite3_value
 }
 
 // ScalarContext is used to represent context associated to scalar function
@@ -246,7 +213,7 @@ func (c *FunctionContext) ResultText(s string) {
 // The leftmost value is number 0.
 // (See sqlite3_result_value, http://sqlite.org/c3ref/result_blob.html)
 func (c *FunctionContext) ResultValue(i int) {
-	C.my_result_value((*C.sqlite3_context)(c.sc), c.argv, C.int(i))
+	C.sqlite3_result_value((*C.sqlite3_context)(c.sc), c.argv[i])
 }
 
 // ResultZeroblob sets the result of an SQL function.
@@ -296,11 +263,12 @@ func (c *FunctionContext) Bool(i int) bool {
 // The leftmost value is number 0.
 // (See sqlite3_value_blob and sqlite3_value_bytes, http://sqlite.org/c3ref/value_blob.html)
 func (c *FunctionContext) Blob(i int) []byte {
-	p := C.my_value_blob(c.argv, C.int(i))
+	p := C.sqlite3_value_blob(c.argv[i])
 	if p == nil {
 		return nil
 	}
-	n := C.my_value_bytes(c.argv, C.int(i))
+
+	n := C.sqlite3_value_bytes(c.argv[i])
 	// value = (*[1 << 30]byte)(unsafe.Pointer(p))[:n]
 	return C.GoBytes(p, n) // The memory space used to hold strings and BLOBs is freed automatically.
 }
@@ -309,32 +277,32 @@ func (c *FunctionContext) Blob(i int) []byte {
 // The leftmost value is number 0.
 // (See sqlite3_value_double, http://sqlite.org/c3ref/value_blob.html)
 func (c *FunctionContext) Double(i int) float64 {
-	return float64(C.my_value_double(c.argv, C.int(i)))
+	return float64(C.sqlite3_value_double(c.argv[i]))
 }
 
 // Int obtains a SQL function parameter value.
 // The leftmost value is number 0.
 // (See sqlite3_value_int, http://sqlite.org/c3ref/value_blob.html)
 func (c *FunctionContext) Int(i int) int {
-	return int(C.my_value_int(c.argv, C.int(i)))
+	return int(C.sqlite3_value_int(c.argv[i]))
 }
 
 // Int64 obtains a SQL function parameter value.
 // The leftmost value is number 0.
 // (See sqlite3_value_int64, http://sqlite.org/c3ref/value_blob.html)
 func (c *FunctionContext) Int64(i int) int64 {
-	return int64(C.my_value_int64(c.argv, C.int(i)))
+	return int64(C.sqlite3_value_int64(c.argv[i]))
 }
 
 // Text obtains a SQL function parameter value.
 // The leftmost value is number 0.
 // (See sqlite3_value_text, http://sqlite.org/c3ref/value_blob.html)
 func (c *FunctionContext) Text(i int) string {
-	p := C.my_value_text(c.argv, C.int(i))
+	p := C.sqlite3_value_text(c.argv[i])
 	if p == nil {
 		return ""
 	}
-	n := C.my_value_bytes(c.argv, C.int(i))
+	n := C.sqlite3_value_bytes(c.argv[i])
 	return C.GoStringN((*C.char)(unsafe.Pointer(p)), n)
 }
 
@@ -342,14 +310,14 @@ func (c *FunctionContext) Text(i int) string {
 // The leftmost value is number 0.
 // (See sqlite3_value_type, http://sqlite.org/c3ref/value_blob.html)
 func (c *FunctionContext) Type(i int) Type {
-	return Type(C.my_value_type(c.argv, C.int(i)))
+	return Type(C.sqlite3_value_type(c.argv[i]))
 }
 
 // NumericType obtains a SQL function parameter value numeric type (with possible conversion).
 // The leftmost value is number 0.
 // (See sqlite3_value_numeric_type, http://sqlite.org/c3ref/value_blob.html)
 func (c *FunctionContext) NumericType(i int) Type {
-	return Type(C.my_value_numeric_type(c.argv, C.int(i)))
+	return Type(C.sqlite3_value_numeric_type(c.argv[i]))
 }
 
 // Value obtains a SQL function parameter value depending on its type.
@@ -416,8 +384,9 @@ func goXFunc(ctx *C.sqlite3_context, argc C.int, argv **C.sqlite3_value) {
 		// To make sure it is not cged
 		udf.scalarCtxs[c] = struct{}{}
 	}
-	c.argv = argv
-	udf.scalar(c, int(argc))
+	n := int(argc)
+	c.argv = (*[1 << 30]*C.sqlite3_value)(unsafe.Pointer(argv))[:n:n]
+	udf.scalar(c, n)
 	c.argv = nil
 }
 
@@ -439,8 +408,9 @@ func goXStep(ctx *C.sqlite3_context, argc C.int, argv **C.sqlite3_value) {
 			c = (*AggregateContext)(p)
 		}
 
-		c.argv = (**C.sqlite3_value)(argv)
-		udf.step(c, int(argc))
+		n := int(argc)
+		c.argv = (*[1 << 30]*C.sqlite3_value)(unsafe.Pointer(argv))[:n:n]
+		udf.step(c, n)
 		c.argv = nil
 	}
 }

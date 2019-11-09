@@ -14,11 +14,7 @@ extern int goSqlite3SetAuthorizer(sqlite3 *db, void *udp);
 extern int goSqlite3BusyHandler(sqlite3 *db, void *udp);
 extern void goSqlite3ProgressHandler(sqlite3 *db, int numOps, void *udp);
 
-// cgo doesn't support varargs
-static inline void my_log(int iErrCode, char *msg) {
-	sqlite3_log(iErrCode, msg);
-}
-
+extern void my_log(int iErrCode, char *msg);
 extern int goSqlite3ConfigLog(void *udp);
 */
 import "C"
