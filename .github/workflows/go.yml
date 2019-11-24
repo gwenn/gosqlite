@@ -29,8 +29,22 @@ jobs:
       - name: Get dependencies
         run: go get -v -t -d ./...
 
-      - name: Build
+      - name: Build unix
+        if: matrix.os == 'ubuntu-latest'
         run: go build -v .
+
+      - name: Build windows
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        run: |
+          dir C:\vcpkg\installed\x64-windows\include\sqlite3.h
+          dir C:\vcpkg\installed\x64-windows\bin\sqlite3.dll
+          set CGO_CFLAGS="-I/C/vcpkg/installed/x64-windows/include -g -O2"
+          set CGO_LDFLAGS="-L/C/vcpkg/installed/x64-windows/bin -g -O2"
+          set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin;C:\vcpkg\installed\x64-windows\include
+          set GODEBUG=cgocheck=0
+          go env
+          go build -v .
 
       - name: Test
         if: matrix.os == 'ubuntu-latest'
