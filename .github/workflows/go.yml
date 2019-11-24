@@ -43,7 +43,8 @@ jobs:
           rem set CGO_CPPFLAGS="-IC:/vcpkg/installed/x64-windows/include"
           rem set CGO_CFLAGS="-IC:/vcpkg/installed/x64-windows/include"
           rem set CGO_LDFLAGS="-LC:\vcpkg\installed\x64-windows\bin"
-          set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin
+          rem set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin
+          set LIBRARY_PATH=%LIBRARY_PATH%;C:\vcpkg\installed\x64-windows\bin
           set GODEBUG=cgocheck=0
           rem go env
           go build -v .
@@ -62,7 +63,8 @@ jobs:
           rem dir C:\vcpkg\installed\x64-windows\bin\sqlite3.dll
           rem set CGO_CPPFLAGS="-IC:/vcpkg/installed/x64-windows/include"
           rem set CGO_CFLAGS="-IC:/vcpkg/installed/x64-windows/include"
-          set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin
+          rem set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin
+          set LIBRARY_PATH=%LIBRARY_PATH%;C:\vcpkg\installed\x64-windows\bin
           set GODEBUG=cgocheck=0
           rem go env
           go test -v -tags all .
