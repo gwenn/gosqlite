@@ -37,15 +37,14 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: cmd
         run: |
+          rem copy header because "-Isomepath" does not work: invalid argument
           copy C:\vcpkg\installed\x64-windows\include\sqlite3.h .
           rem copy C:\vcpkg\installed\x64-windows\bin\sqlite3.dll .
           rem gcc --version
           rem set CGO_CPPFLAGS="-IC:/vcpkg/installed/x64-windows/include"
-          rem set CGO_CFLAGS="-IC:/vcpkg/installed/x64-windows/include"
           rem set CGO_LDFLAGS="-LC:\vcpkg\installed\x64-windows\bin"
-          rem set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin
+          rem make mingw ld happy by adding the path to dll:
           set LIBRARY_PATH=%LIBRARY_PATH%;C:\vcpkg\installed\x64-windows\bin
-          set GODEBUG=cgocheck=0
           rem go env
           go build -v .
 
@@ -59,12 +58,9 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: cmd
         run: |
-          rem dir C:\vcpkg\installed\x64-windows\include\sqlite3.h
-          rem dir C:\vcpkg\installed\x64-windows\bin\sqlite3.dll
-          rem set CGO_CPPFLAGS="-IC:/vcpkg/installed/x64-windows/include"
-          rem set CGO_CFLAGS="-IC:/vcpkg/installed/x64-windows/include"
-          rem set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin
+          rem try to make cgo happy
+          set CGO_CPPFLAGS="-IC:/vcpkg/installed/x64-windows/include"
+          set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin
           set LIBRARY_PATH=%LIBRARY_PATH%;C:\vcpkg\installed\x64-windows\bin
           set GODEBUG=cgocheck=0
-          rem go env
           go test -v -tags all .
