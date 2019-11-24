@@ -60,7 +60,8 @@ jobs:
         shell: cmd
         run: |
           rem try to make cgo happy
-          set CGO_CPPFLAGS="-I."
+          set CGO_CPPFLAGS=-IC:/vcpkg/installed/x64-windows/include
+          set CPATH=%CPATH%;C:\vcpkg\installed\x64-windows\include
           set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin
           set LIBRARY_PATH=%LIBRARY_PATH%;C:\vcpkg\installed\x64-windows\bin
           set GODEBUG=cgocheck=0
