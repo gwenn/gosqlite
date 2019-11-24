@@ -37,14 +37,15 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: cmd
         run: |
-          rem dir C:\vcpkg\installed\x64-windows\include\sqlite3.h
-          rem dir C:\vcpkg\installed\x64-windows\bin\sqlite3.dll
-          set CGO_CPPFLAGS="-IC:/vcpkg/installed/x64-windows/include"
+          copy C:\vcpkg\installed\x64-windows\include\sqlite3.h .
+          copy C:\vcpkg\installed\x64-windows\bin\sqlite3.dll .
+          gcc --version
+          rem set CGO_CPPFLAGS="-IC:/vcpkg/installed/x64-windows/include"
           rem set CGO_CFLAGS="-IC:/vcpkg/installed/x64-windows/include"
           rem set CGO_LDFLAGS="-LC:\vcpkg\installed\x64-windows\bin"
-          set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin;C:\vcpkg\installed\x64-windows\include
+          rem set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin;C:\vcpkg\installed\x64-windows\include
           set GODEBUG=cgocheck=0
-          go env
+          rem go env
           go build -v .
 
       - name: Test
@@ -59,9 +60,9 @@ jobs:
         run: |
           rem dir C:\vcpkg\installed\x64-windows\include\sqlite3.h
           rem dir C:\vcpkg\installed\x64-windows\bin\sqlite3.dll
-          set CGO_CPPFLAGS="-IC:/vcpkg/installed/x64-windows/include"
+          rem set CGO_CPPFLAGS="-IC:/vcpkg/installed/x64-windows/include"
           rem set CGO_CFLAGS="-IC:/vcpkg/installed/x64-windows/include"
-          set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin;C:\vcpkg\installed\x64-windows\include
+          rem set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin;C:\vcpkg\installed\x64-windows\include
           set GODEBUG=cgocheck=0
-          go env
+          rem go env
           go test -v -tags all .
