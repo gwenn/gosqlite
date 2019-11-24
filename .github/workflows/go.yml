@@ -39,8 +39,9 @@ jobs:
         run: |
           rem dir C:\vcpkg\installed\x64-windows\include\sqlite3.h
           rem dir C:\vcpkg\installed\x64-windows\bin\sqlite3.dll
-          rem set CGO_CFLAGS="-IC:\vcpkg\installed\x64-windows\include -g -O2"
-          rem set CGO_LDFLAGS="-LC:\vcpkg\installed\x64-windows\bin -g -O2"
+          set CGO_CPPFLAGS="-IC:/vcpkg/installed/x64-windows/include"
+          rem set CGO_CFLAGS="-IC:/vcpkg/installed/x64-windows/include"
+          rem set CGO_LDFLAGS="-LC:\vcpkg\installed\x64-windows\bin"
           set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin;C:\vcpkg\installed\x64-windows\include
           set GODEBUG=cgocheck=0
           go env
@@ -58,8 +59,8 @@ jobs:
         run: |
           rem dir C:\vcpkg\installed\x64-windows\include\sqlite3.h
           rem dir C:\vcpkg\installed\x64-windows\bin\sqlite3.dll
-          rem set CGO_CFLAGS="-IC:\vcpkg\installed\x64-windows\include -g -O2"
-          rem set CGO_LDFLAGS="-LC:\vcpkg\installed\x64-windows\bin -g -O2"
+          set CGO_CPPFLAGS="-IC:/vcpkg/installed/x64-windows/include"
+          rem set CGO_CFLAGS="-IC:/vcpkg/installed/x64-windows/include"
           set PATH=%PATH%;C:\vcpkg\installed\x64-windows\bin;C:\vcpkg\installed\x64-windows\include
           set GODEBUG=cgocheck=0
           go env
