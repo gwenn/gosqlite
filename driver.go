@@ -328,15 +328,6 @@ func (s *stmt) QueryContext(ctx context.Context, args []driver.NamedValue) (driv
 	return &rowsImpl{s, nil, ctx}, nil
 }
 
-func (s *stmt) bind(args []driver.Value) error {
-	for i, v := range args {
-		if err := s.s.BindByIndex(i+1, v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // https://golang.org/pkg/database/sql/driver/#Rows
 func (r *rowsImpl) Columns() []string {
 	if r.columnNames == nil {
