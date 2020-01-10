@@ -1,5 +1,5 @@
 [![GoDoc](https://godoc.org/github.com/gwenn/gosqlite?status.svg)](https://godoc.org/github.com/gwenn/gosqlite)
-[![Build Status](https://github.com/gwenn/gosqlite/workflows/Go/badge.svg)](https://github.com/gwenn/gosqlite/actions)
+[![Build Status](https://github.com/gwenn/gosqlite/workflows/CI/badge.svg)](https://github.com/gwenn/gosqlite/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gwenn/gosqlite)](https://goreportcard.com/report/github.com/gwenn/gosqlite)
 [![Coverage Status](https://coveralls.io/repos/github/gwenn/gosqlite/badge.svg?branch=master)](https://coveralls.io/github/gwenn/gosqlite?branch=master)
 
