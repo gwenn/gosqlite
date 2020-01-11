@@ -8,16 +8,20 @@ package sqlite
 #include <sqlite3.h>
 #include <stdlib.h>
 
-// These wrappers are necessary because SQLITE_TRANSIENT
-// is a pointer constant, and cgo doesn't translate them correctly.
-extern void my_result_text(sqlite3_context *ctx, char *p, int np);
-extern void my_result_blob(sqlite3_context *ctx, void *p, int np);
-
 extern void goXAuxDataDestroy(void*);
 extern void goXDestroy(void*);
 extern void goXFunc(sqlite3_context *ctx, int argc, sqlite3_value **argv);
 extern void goXStep(sqlite3_context *ctx, int argc, sqlite3_value **argv);
 extern void goXFinal(sqlite3_context *ctx);
+
+// These wrappers are necessary because SQLITE_TRANSIENT
+// is a pointer constant, and cgo doesn't translate them correctly.
+static inline void my_result_text(sqlite3_context *ctx, char *p, int np) {
+       sqlite3_result_text(ctx, p, np, SQLITE_TRANSIENT);
+}
+static inline void my_result_blob(sqlite3_context *ctx, void *p, int np) {
+       sqlite3_result_blob(ctx, p, np, SQLITE_TRANSIENT);
+}
 */
 import "C"
 
