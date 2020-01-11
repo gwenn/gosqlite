@@ -140,7 +140,7 @@ func TestInsert(t *testing.T) {
 	createTable(db, t)
 	db.Begin()
 	for i := 0; i < 1000; i++ {
-		ierr := db.Exec("INSERT INTO test (float_num, int_num, a_string) VALUES (?, ?, ?)", float64(i)*float64(3.14), i, "hello")
+		ierr := db.Exec("INSERT INTO test (float_num, int_num, a_string) VALUES (?, ?, ?)", float64(i)*3.14, i, "hello")
 		checkNoError(t, ierr, "insert error: %s")
 		c := db.Changes()
 		assert.Equal(t, 1, c, "changes")

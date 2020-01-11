@@ -125,7 +125,7 @@ func ExampleStmt_NamedScan() {
 type YesOrNo bool
 
 func (b *YesOrNo) Scan(src interface{}) error {
-	*b = YesOrNo(src == "Y" || src == "yes")
+	*b = src == "Y" || src == "yes"
 	return nil
 }
 

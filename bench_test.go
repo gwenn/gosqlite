@@ -25,7 +25,7 @@ func fill(b *testing.B, db *Conn, n int) {
 
 	panicOnError(b, db.Begin())
 	for i := 0; i < n; i++ {
-		panicOnError(b, s.Exec(float64(i)*float64(3.14), i, "hello"))
+		panicOnError(b, s.Exec(float64(i)*3.14, i, "hello"))
 	}
 	panicOnError(b, s.Finalize())
 	panicOnError(b, db.Commit())
@@ -117,7 +117,7 @@ func BenchmarkInsert(b *testing.B) {
 	b.StartTimer()
 	panicOnError(b, db.Begin())
 	for i := 0; i < b.N; i++ {
-		/*panicOnError(b, */ s.Exec(float64(i)*float64(3.14), i, "hello") /*)*/
+		/*panicOnError(b, */ s.Exec(float64(i)*3.14, i, "hello") /*)*/
 	}
 	panicOnError(b, db.Commit())
 }
@@ -138,7 +138,7 @@ func BenchmarkNamedInsert(b *testing.B) {
 	b.StartTimer()
 	panicOnError(b, db.Begin())
 	for i := 0; i < b.N; i++ {
-		/*panicOnError(b, */ s.NamedBind(":f", float64(i)*float64(3.14), ":i", i, ":s", "hello") /*)*/
+		/*panicOnError(b, */ s.NamedBind(":f", float64(i)*3.14, ":i", i, ":s", "hello") /*)*/
 		Must(s.Next())
 	}
 	panicOnError(b, db.Commit())

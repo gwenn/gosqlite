@@ -64,7 +64,7 @@ func (c *cache) release(s *Stmt) error {
 	defer c.m.Unlock()
 	c.l.PushFront(s)
 	for c.l.Len() > c.maxSize {
-		c.l.Remove(c.l.Back()).(*Stmt).finalize()
+		_ = c.l.Remove(c.l.Back()).(*Stmt).finalize()
 	}
 	return nil
 }
@@ -80,7 +80,7 @@ func (c *cache) flush() {
 	var e, next *list.Element
 	for e = c.l.Front(); e != nil; e = next {
 		next = e.Next()
-		c.l.Remove(e).(*Stmt).finalize()
+		_ = c.l.Remove(e).(*Stmt).finalize()
 	}
 }
 

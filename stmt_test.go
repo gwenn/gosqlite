@@ -58,7 +58,7 @@ func TestInsertWithStatement(t *testing.T) {
 
 	db.Begin()
 	for i := 0; i < 1000; i++ {
-		c, ierr := s.ExecDml(float64(i)*float64(3.14), i, "hello")
+		c, ierr := s.ExecDml(float64(i)*3.14, i, "hello")
 		checkNoError(t, ierr, "insert error: %s")
 		assert.Equal(t, 1, c, "changes")
 		assert.T(t, !s.Busy(), "statement not busy")
