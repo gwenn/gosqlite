@@ -17,6 +17,9 @@ package sqlite
 // #define SQLITE_STATIC      ((sqlite3_destructor_type)0)
 // #define SQLITE_TRANSIENT   ((sqlite3_destructor_type)-1)
 
+static inline int my_bind_text(sqlite3_stmt *stmt, int pidx, const char *data, int data_len) {
+	return sqlite3_bind_text(stmt, pidx, data, data_len, free);
+}
 static inline int my_bind_empty_text(sqlite3_stmt *stmt, int pidx) {
 	return sqlite3_bind_text(stmt, pidx, "", 0, SQLITE_STATIC);
 }
@@ -355,7 +358,7 @@ func (s *Stmt) BindByIndex(index int, value interface{}) error {
 			if i64 && len(value) > math.MaxInt32 {
 				return s.specificError("string too big: %d at index %d", len(value), index)
 			}
-			rv = C.sqlite3_bind_text(s.stmt, i, C.CString(value), C.int(len(value)), (*[0]byte)(C.free))
+			rv = C.my_bind_text(s.stmt, i, C.CString(value), C.int(len(value)))
 		}
 	case int:
 		if i64 {
@@ -391,7 +394,7 @@ func (s *Stmt) BindByIndex(index int, value interface{}) error {
 			rv = C.sqlite3_bind_int64(s.stmt, i, C.sqlite3_int64(value.Unix()))
 		} else {
 			v := value.Format(s.c.DefaultTimeLayout)
-			rv = C.sqlite3_bind_text(s.stmt, i, C.CString(v), C.int(len(v)), (*[0]byte)(C.free))
+			rv = C.my_bind_text(s.stmt, i, C.CString(v), C.int(len(v)))
 		}
 	case ZeroBlobLength:
 		rv = C.sqlite3_bind_zeroblob(s.stmt, i, C.int(value))
@@ -417,7 +420,7 @@ func (s *Stmt) BindReflect(index int, value interface{}) error {
 	switch v.Kind() {
 	case reflect.String:
 		vs := v.String() // TODO NullIfEmptyString
-		rv = C.sqlite3_bind_text(s.stmt, i, C.CString(vs), C.int(len(vs)), (*[0]byte)(C.free))
+		rv = C.my_bind_text(s.stmt, i, C.CString(vs), C.int(len(vs)))
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		rv = C.sqlite3_bind_int64(s.stmt, i, C.sqlite3_int64(v.Int()))
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
