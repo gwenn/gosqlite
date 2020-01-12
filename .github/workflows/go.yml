@@ -53,4 +53,4 @@ jobs:
           set CGO_CPPFLAGS=-IC:/vcpkg/installed/x64-windows/include
           set CGO_LDFLAGS=-LC:/vcpkg/installed/x64-windows/bin
           set GODEBUG=cgocheck=0
-          go test -tags all .
+          go test -v -tags all .
