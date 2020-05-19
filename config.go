@@ -20,10 +20,18 @@ static inline int goSqlite3ConfigThreadMode(int mode) {
 static inline int goSqlite3Config(int op, int mode) {
 	return sqlite3_config(op, mode);
 }
+
+// Workaround for missing define in older SQLite
+#if SQLITE_VERSION_NUMBER < 3026000
+#define SQLITE_DBCONFIG_DEFENSIVE 1010
+#endif
 */
 import "C"
 
-import "unsafe"
+import (
+	"errors"
+	"unsafe"
+)
 
 // ThreadingMode enumerates SQLite threading mode
 // See ConfigThreadingMode
@@ -119,6 +127,11 @@ func (c *Conn) AreTriggersEnabled() (bool, error) {
 //
 // (See https://www.sqlite.org/c3ref/c_dbconfig_defensive.html#sqlitedbconfigdefensive)
 func (c *Conn) EnableDefensive() (bool, error) {
+	if C.SQLITE_VERSION_NUMBER < 3026000 {
+		// SQLITE_DBCONFIG_DEFENSIVE was added in SQLite 3.26.0:
+		//   https://github.com/sqlite/sqlite/commit/a296cda016dfcf81674b04c041637fa0a4f426ac
+		return false, errors.New("SQLITE_DBCONFIG_DEFENSIVE isn't present in the called SQLite library")
+	}
 	return c.queryOrSetEnableDbConfig(C.SQLITE_DBCONFIG_DEFENSIVE, 1)
 }
 
