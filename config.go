@@ -20,10 +20,18 @@ static inline int goSqlite3ConfigThreadMode(int mode) {
 static inline int goSqlite3Config(int op, int mode) {
 	return sqlite3_config(op, mode);
 }
+
+// Workaround for missing define in older SQLite
+#if SQLITE_VERSION_NUMBER < 3026000
+#define SQLITE_DBCONFIG_DEFENSIVE 1010
+#endif
 */
 import "C"
 
-import "unsafe"
+import (
+	"errors"
+	"unsafe"
+)
 
 // ThreadingMode enumerates SQLite threading mode
 // See ConfigThreadingMode
@@ -76,11 +84,15 @@ func EnableSharedCache(b bool) error {
 	return Errno(rv)
 }
 
+/* Database Connection Configuration Options
+//   https://www.sqlite.org/c3ref/c_dbconfig_defensive.html
+ */
+
 // EnableFKey enables or disables the enforcement of foreign key constraints.
 // Calls sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_FKEY, b).
 // Another way is PRAGMA foreign_keys = boolean;
 //
-// (See http://sqlite.org/c3ref/c_dbconfig_enable_fkey.html)
+// (See https://www.sqlite.org/c3ref/c_dbconfig_defensive.html#sqlitedbconfigenablefkey)
 func (c *Conn) EnableFKey(b bool) (bool, error) {
 	return c.queryOrSetEnableDbConfig(C.SQLITE_DBCONFIG_ENABLE_FKEY, btocint(b))
 }
@@ -89,7 +101,7 @@ func (c *Conn) EnableFKey(b bool) (bool, error) {
 // Calls sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_FKEY, -1).
 // Another way is PRAGMA foreign_keys;
 //
-// (See http://sqlite.org/c3ref/c_dbconfig_enable_fkey.html)
+// (See https://www.sqlite.org/c3ref/c_dbconfig_defensive.html#sqlitedbconfigenablefkey)
 func (c *Conn) IsFKeyEnabled() (bool, error) {
 	return c.queryOrSetEnableDbConfig(C.SQLITE_DBCONFIG_ENABLE_FKEY, -1)
 }
@@ -97,7 +109,7 @@ func (c *Conn) IsFKeyEnabled() (bool, error) {
 // EnableTriggers enables or disables triggers.
 // Calls sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_TRIGGER, b).
 //
-// (See http://sqlite.org/c3ref/c_dbconfig_enable_fkey.html)
+// (See https://www.sqlite.org/c3ref/c_dbconfig_defensive.html#sqlitedbconfigenabletrigger)
 func (c *Conn) EnableTriggers(b bool) (bool, error) {
 	return c.queryOrSetEnableDbConfig(C.SQLITE_DBCONFIG_ENABLE_TRIGGER, btocint(b))
 }
@@ -105,9 +117,22 @@ func (c *Conn) EnableTriggers(b bool) (bool, error) {
 // AreTriggersEnabled checks if triggers are enabled.
 // Calls sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_TRIGGER, -1)
 //
-// (See http://sqlite.org/c3ref/c_dbconfig_enable_fkey.html)
+// (See https://www.sqlite.org/c3ref/c_dbconfig_defensive.html#sqlitedbconfigenabletrigger)
 func (c *Conn) AreTriggersEnabled() (bool, error) {
 	return c.queryOrSetEnableDbConfig(C.SQLITE_DBCONFIG_ENABLE_TRIGGER, -1)
+}
+
+// EnableDefensive enables defensive mode for the database connection.
+// Calls sqlite3_db_config(db, SQLITE_DBCONFIG_DEFENSIVE, 1).
+//
+// (See https://www.sqlite.org/c3ref/c_dbconfig_defensive.html#sqlitedbconfigdefensive)
+func (c *Conn) EnableDefensive() (bool, error) {
+	if C.SQLITE_VERSION_NUMBER < 3026000 {
+		// SQLITE_DBCONFIG_DEFENSIVE was added in SQLite 3.26.0:
+		//   https://github.com/sqlite/sqlite/commit/a296cda016dfcf81674b04c041637fa0a4f426ac
+		return false, errors.New("SQLITE_DBCONFIG_DEFENSIVE isn't present in the called SQLite library")
+	}
+	return c.queryOrSetEnableDbConfig(C.SQLITE_DBCONFIG_DEFENSIVE, 1)
 }
 
 func (c *Conn) queryOrSetEnableDbConfig(key, i C.int) (bool, error) {
