@@ -272,6 +272,12 @@ func (c *conn) ResetSession(_ context.Context) error {
 	return nil
 }
 
+// https://golang.org/pkg/database/sql/driver/#Validator
+func (c *conn) IsValid() bool {
+	// closed or pending transaction or at least one statement busy
+	return !c.c.IsClosed() /*&& !c.c.GetAutocommit() && !c.c.IsBusy()*/
+}
+
 // https://golang.org/pkg/database/sql/driver/#Stmt
 func (s *stmt) Close() error {
 	if s.rowsRef { // Currently, it never happens because the sql.Stmt doesn't call driver.Stmt in this case
